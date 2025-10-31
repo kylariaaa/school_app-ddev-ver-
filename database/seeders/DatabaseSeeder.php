@@ -14,7 +14,10 @@ class DatabaseSeeder extends Seeder
         $this->call([
             StudentSeeder::class,
             TeacherSeeder::class,
-            StudentTeacherSeeder::class, // Seeder untuk pivot
+            StudentTeacherSeeder::class,
+            JurusanSeeder::class,
+            SchoolClassSeeder::class,
+            TeacherSeeder::class, // Seeder untuk pivot
         ]);
     }
 }

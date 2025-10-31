@@ -56,3 +56,4 @@ class SchoolClassController extends Controller
             ->with('success', 'Data kelas berhasil dihapus.');
     }
 }
+//dadadadad
