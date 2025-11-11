@@ -3,33 +3,123 @@
 @section('title', 'Dashboard')
 
 @section('content')
-    <div class="py-20 px-4 text-white">
-        <div class="container mx-auto p-8 bg-gray-800 rounded-3xl shadow-2xl text-center border-2 border-sky-500">
+<div class="container mx-auto px-6 py-8">
+    <h1 class="text-4xl font-bold text-white mb-4 animate-fade-in-down">Dashboard</h1>
+    <p class="text-lg text-gray-400 mb-8 animate-fade-in-down">
+        Selamat datang kembali, <span class="font-bold text-white">{{ Auth::user()->name }}</span>!
+    </p>
 
-            <!-- Title -->
-            <h1 class="text-4xl md:text-5xl font-bold mb-4 text-white">Dashboard Aplikasi</h1>
-
-            <!-- Description -->
-            <p class="text-gray-400 max-w-xl mx-auto leading-relaxed">
-                Halaman ini akan menjadi pusat kontrol personal Anda setelah kita membangun fitur otentikasi dan hak akses.
-            </p>
-
-            <!-- Action Buttons -->
-            <div class="mt-10 flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-
-                <!-- Button: Mulai Jelajah -->
-                <a href="#" class="bg-sky-600 text-white px-8 py-4 rounded-full font-semibold shadow-xl
-                     hover:bg-sky-700 transition-all duration-300 transform hover:-translate-y-1 hover:scale-105">
-                    Mulai Jelajah
-                </a>
-
-                <!-- Button: Bantuan -->
-                <a href="#" class="bg-gray-700 text-gray-200 px-8 py-4 rounded-full font-semibold shadow-xl
-                     hover:bg-gray-600 transition-all duration-300 transform hover:-translate-y-1 hover:scale-105">
-                    Bantuan
-                </a>
-            </div>
-
+    {{-- Kartu Statistik --}}
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+            <p class="text-sm text-gray-400">Total Siswa</p>
+            <p class="text-3xl font-bold text-sky-400">{{ $totalStudents }}</p>
+        </div>
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+            <p class="text-sm text-gray-400">Total Guru</p>
+            <p class="text-3xl font-bold text-sky-400">{{ $totalTeachers }}</p>
+        </div>
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+            <p class="text-sm text-gray-400">Total Kelas</p>
+            <p class="text-3xl font-bold text-sky-400">{{ $totalClasses }}</p>
+        </div>
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+            <p class="text-sm text-gray-400">Total Jurusan</p>
+            <p class="text-3xl font-bold text-sky-400">{{ $totalJurusans }}</p>
         </div>
     </div>
+
+    {{-- Grafik --}}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        <div class="lg:col-span-2 bg-gray-800 p-6 rounded-lg shadow-lg">
+            <h2 class="text-xl font-bold text-white mb-4">Jumlah Siswa per Jurusan</h2>
+            <canvas id="jurusanChart"></canvas>
+        </div>
+
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+            <h2 class="text-xl font-bold text-white mb-4">Aksi Cepat</h2>
+            <div class="space-y-4">
+                <a href="{{ route('students.create') }}" class="block w-full text-center bg-sky-600 text-white px-6 py-3 rounded-lg hover:bg-sky-700">Tambah Siswa Baru</a>
+                <a href="{{ route('teachers.create') }}" class="block w-full text-center bg-sky-600 text-white px-6 py-3 rounded-lg hover:bg-sky-700">Tambah Guru Baru</a>
+                <a href="{{ route('school-classes.create') }}" class="block w-full text-center bg-sky-600 text-white px-6 py-3 rounded-lg hover:bg-sky-700">Tambah Kelas Baru</a>
+            </div>
+        </div>
+    </div>
+
+    {{-- Tabel --}}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+            <h2 class="text-xl font-bold text-white mb-4">5 Siswa Pendaftar Terakhir</h2>
+            <table class="min-w-full text-left text-sm font-light">
+                <thead class="border-b border-gray-600 font-medium">
+                    <tr>
+                        <th class="px-6 py-4">Nama Siswa</th>
+                        <th class="px-6 py-4">Kelas</th>
+                        <th class="px-6 py-4">Jurusan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($latestStudents as $student)
+                        <tr class="border-b border-gray-700">
+                            <td class="px-6 py-4 font-medium">{{ $student->nama }}</td>
+                            <td class="px-6 py-4 text-gray-400">{{ $student->schoolClass->name }}</td>
+                            <td class="px-6 py-4 text-gray-400">{{ $student->schoolClass->jurusan->name }}</td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="3" class="text-center py-4 text-gray-500">Belum ada data siswa.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+            <h2 class="text-xl font-bold text-white mb-4">5 Guru Pendaftar Terakhir</h2>
+            <table class="min-w-full text-left text-sm font-light">
+                <thead class="border-b border-gray-600 font-medium">
+                    <tr>
+                        <th class="px-6 py-4">Nama Guru</th>
+                        <th class="px-6 py-4">Tipe</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($latestTeachers as $teacher)
+                        <tr class="border-b border-gray-700">
+                            <td class="px-6 py-4 font-medium">{{ $teacher->nama }}</td>
+                            <td class="px-6 py-4 text-gray-400">{{ ucfirst($teacher->tipe_guru) }}</td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="2" class="text-center py-4 text-gray-500">Belum ada data guru.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{{-- Script Chart.js --}}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const ctx = document.getElementById('jurusanChart');
+    const chartLabels = @json($chartLabels);
+    const chartData = @json($chartData);
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: chartLabels,
+            datasets: [{
+                label: 'Jumlah Siswa',
+                data: chartData,
+                backgroundColor: 'rgba(56, 189, 248, 0.6)',
+                borderColor: 'rgba(56, 189, 248, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: { beginAtZero: true },
+            }
+        }
+    });
+});
+</script>
 @endsection

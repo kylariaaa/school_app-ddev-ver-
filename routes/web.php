@@ -9,6 +9,7 @@ use App\Http\Controllers\SchoolClassController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 
+
 /*
 |--------------------------------------------------------------------------
 | Rute Publik
